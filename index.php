@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 spl_autoload_register(function($class_name) {
     $file = 'classes/controllers/' . $class_name . '.php';
     if (file_exists($file)) {
@@ -30,12 +32,16 @@ $request = new Request();
 // die($e);
 
 // Route the request to the right place
-$controller_name = ucfirst($request->url_elements[0]) . 'Controller';
-if (class_exists($controller_name)) {
-	$controller = new $controller_name();
-	$action_name = strtolower($request->verb) . 'Action';
-	$result = $controller->$action_name($request);
-	print_r($result);
-} else {
-    echo 'controller finns icke';
+try {
+    $controller_name = ucfirst($request->url_elements[0]) . 'Controller';
+    if (class_exists($controller_name)) {
+    	$controller = new $controller_name();
+    	$action_name = strtolower($request->verb) . 'Action';
+    	$result = $controller->$action_name($request);
+    	print_r($result);
+    } else {
+        throw new Exception("Couldn't find controller.");
+    }
+} catch (Exception $e) {
+    echo $e->getMessage();
 }
