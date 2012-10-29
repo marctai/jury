@@ -12,7 +12,8 @@ class DebatesController extends MyController
 			
 			if (in_array($dir, $allowed)) {
 				$params = array_slice($request->url_elements, 2);
-				$data = $this->$dir($params, 'get');
+				$method = 'get' . ucfirst($dir);
+				$data = $this->$method($params);
 			} else {
 				throw new Exception("Couldn't find " . $dir);
 			}
@@ -25,35 +26,28 @@ class DebatesController extends MyController
 		// ...
 	}
 
-	protected function open($params, $method)
+	protected function getOpen($params)
 	{
-		if ($method == 'get') {
-			// Allowed params
-			$allowed = array('random');
+		$allowed = array('random');
 
-			if (!empty($params) && !$params[0] == '') {
-				
-				if (in_array($params[0], $allowed)) {
-					// open/random stuff!
-					return 'open/' . $params[0];
-				} else {
-					throw new Exception("Couldn't find " . $params[0]);
-				}
+		if (!empty($params) && !$params[0] == '') {
+			
+			if (in_array($params[0], $allowed)) {
+				// open/random stuff!
+				return 'open/' . $params[0];
+			} else {
+				throw new Exception("Couldn't find " . $params[0]);
 			}
-			return 'open';
 		}
-
-		if ($method == 'put') {
-			// ...
-		}
+		return 'open';
 	}
 
-	protected function pending($params, $method)
+	protected function getPending($params)
 	{
 		return 'pending';
 	}
 
-	protected function finished($params, $method)
+	protected function getFinished($params, $method)
 	{
 		return 'finished';
 	}
