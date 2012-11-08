@@ -2,13 +2,13 @@
 
 class DebatesController extends MyController
 {
-	protected $model;
+    protected $model;
 
-	public function __construct() 
-	{
+    public function __construct() 
+    {
         $this->model = new DebatesModel();
         return true;
-	}
+    }
 
     protected function routeActions($request, $method, $allowed_dirs)
     {
