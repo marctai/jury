@@ -4,17 +4,17 @@ class DebatesController extends MyController
 {
     protected $model;
 
-    public function __construct() 
-    {
-        $this->model = new DebatesModel();
-        return true;
-    }
+	public function __construct() 
+	{
+		$this->model = new DebatesModel();
+		return true;
+	}
 
-    protected function routeActions($request, $method, $allowed_dirs)
-    {
-    	$data = '';
+	protected function routeActions($request, $method, $allowed_dirs)
+	{
+		$data = '';
 
-    	if (isset($request->url_elements[1]) && !empty($request->url_elements[1])) {
+		if (isset($request->url_elements[1]) && !empty($request->url_elements[1])) {
 			$dir = $request->url_elements[1];
 			
 			if (in_array($dir, $allowed_dirs)) {
@@ -26,7 +26,7 @@ class DebatesController extends MyController
 			}
 		}
 		return $data;
-    }
+	}
 
 
 	public function getAction($request)
@@ -50,9 +50,9 @@ class DebatesController extends MyController
 	protected function getOpen($dirs, $params)
 	{
 		$allowed_dirs = array('random');
-        
+
 		if (!empty($dirs) && !$dirs[0] == '') {
-			
+
 			if (in_array($dirs[0], $allowed_dirs)) {
 				// open/random stuff!
 				return 'open/' . $dirs[0];
@@ -66,16 +66,15 @@ class DebatesController extends MyController
 	protected function putOpen($dirs, $params)
 	{
 		if (isset($dirs[0]) && ctype_digit($dirs[0])) {
-           
-            if (isset($params['arg']) && isset($params['stance'])) {
-		        // TODO: Some kind of validation of params
-	    	    print_r($params);
-	    	    $this->model->putOpen($dirs[0], $params['arg'], $params['stance']);
-	    	} else {
-	    		throw new Exception('Missing parameters');
-	    	}
-		}
 
+			if (isset($params['arg']) && isset($params['stance'])) {
+				// TODO: Some kind of validation of params
+				print_r($params);
+				$this->model->putOpen($dirs[0], $params['arg'], $params['stance']);
+			} else {
+				throw new Exception('Missing parameters');
+			}
+		}
 	}
 
 	protected function getPending($params)
