@@ -34,7 +34,7 @@ class Request
 			parse_str($_SERVER['QUERY_STRING'], $parameters);
 		}
 
-		//
+		// Get body content
 		$body = file_get_contents("php://input");
 		$content_type = false;
 		if (isset($_SERVER['CONTENT_TYPE'])) {
