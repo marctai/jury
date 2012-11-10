@@ -2,7 +2,7 @@
 
 class DebatesController extends MyController
 {
-    protected $model;
+	protected $model;
 
 	public function __construct() 
 	{
@@ -69,11 +69,14 @@ class DebatesController extends MyController
 
 			if (isset($params['arg']) && isset($params['stance'])) {
 				// TODO: Some kind of validation of params
-				print_r($params);
+				// print_r($params);
 				$this->model->putOpen($dirs[0], $params['arg'], $params['stance']);
 			} else {
-				throw new Exception('Missing parameters');
+				throw new Exception("Missing parameters");
+				
 			}
+		} else {
+			throw new Exception("Missing ID");
 		}
 	}
 
