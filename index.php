@@ -38,7 +38,7 @@ try {
     	$controller = new $controller_name();
     	$action_name = strtolower($request->verb) . 'Action';
     	$result = $controller->$action_name($request);
-    	print_r($result);
+    	print_r(json_encode($result));
     } else {
         throw new Exception("Couldn't find controller.");
     }
