@@ -47,6 +47,7 @@ class DebatesModel extends Model
 				$debate = array('message' => 'No open debates and no subjects for new debates. Bummer! :(');
 				return $debate;
 			}
+		// catchen behövs nog inte här, den fångas upp av catchen i getOpen.
 		} catch (PDOException $e) {
 			echo 'Database error: ' . $e->getMessage();
 		}
@@ -58,28 +59,37 @@ class DebatesModel extends Model
 		return $debate;
 	}
 
-	// public function putOpen($id, $arg, $stance)
-	// {
-	// 	$arg_stance = 'arg_' . $stance;
-	// 	$stmt = $this->pdo->prepare("UPDATE debates SET arg_for = :arg WHERE id = :id");
-	// 	$stmt->execute(array(
-	// 		':arg' => $arg,
-	// 		':id' => $id));
+	public function putOpen($subject_id, $stance, $argument, $id)
+	{
+		return $this->insertArgument($subject_id, $stance, $argument, $id);
+	}
 
-	// }
+	public function postOpen($subject_id, $stance, $argument)
+	{
+		return $this->insertArgument($subject_id, $stance, $argument);
+	}
 
-	// public function postOpen($stance, $argument, $subject_id)
-	// {
-	// 	// Insert into arguments
-	// 	$stmt = $this->pdo->prepare("INSERT INTO arguments WHERE stance = :stance, argument = :argument, FK_subjects_id = :subject_id");
-	// 	$params = array(':stance' => $stance, 
-	// 		':argument' => $argument, 
-	// 		':subject_id' => $subject_id);
-	// 	$stmt->execute($params);
+	protected function insertArgument($subject_id, $stance, $argument, $id = null)
+	{
+		try {
+			$stmt = $this->pdo->prepare("INSERT INTO arguments SET stance = :stance, argument = :argument, FK_subjects_id = :subject_id");
+			$params = array(':stance' => $stance, 
+				':argument' => $argument, 
+				':subject_id' => $subject_id);
+			$stmt->execute($params);
 
-	// 	// Retrive arguments id
-	// 	$last_inserted = PDO::lastInsertID();
+			// Retrive arguments id
+			$last_inserted_id = $this->pdo->lastInsertID();
 
-	// 	// Insert id into debates
-	// }
+			// If id is null create a new debate, else insert into existing debate
+			if ($id == null) {
+				$this->pdo->query("INSERT INTO debates SET FK_arguments_id_first = $last_inserted_id");
+			} else {
+				$this->pdo->query("UPDATE debates SET FK_arguments_id_second = $last_inserted_id WHERE id = $id");
+			}
+		} catch (PDOException $e) {
+			echo 'Database error in posetOpen: ' . $e->getMessage();
+		}
+		return true;
+	}
 }

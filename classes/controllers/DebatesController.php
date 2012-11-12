@@ -31,19 +31,22 @@ class DebatesController extends MyController
 
 	public function getAction($request)
 	{
-		$allowed_dirs = array('open', 'pending', 'finished');
-		
+		$allowed_dirs = array('open', 'pending', 'finished');	
 		$data = $this->routeActions($request, 'get', $allowed_dirs);
+		return $data;
+	}
 
+	public function postAction($request)
+	{
+		$allowed_dirs = array('open');
+		$data = $this->routeActions($request, 'post', $allowed_dirs);
 		return $data;
 	}
 
 	public function putAction($request)
 	{
 		$allowed_dirs = array('open');
-		
 		$data = $this->routeActions($request, 'put', $allowed_dirs);
-
 		return $data;
 	}
 
@@ -67,10 +70,10 @@ class DebatesController extends MyController
 	{
 		if (isset($dirs[0]) && ctype_digit($dirs[0])) {
 
-			if (isset($params['arg']) && isset($params['stance'])) {
+			if (isset($params['argument']) && isset($params['stance']) && isset($params['subject_id'])) {
 				// TODO: Some kind of validation of params
 				// print_r($params);
-				$this->model->putOpen($dirs[0], $params['arg'], $params['stance']);
+				return $this->model->putOpen($params['subject_id'], $params['stance'], $params['argument'], $dirs[0]);
 			} else {
 				throw new Exception("Missing parameters");
 				
@@ -78,6 +81,16 @@ class DebatesController extends MyController
 		} else {
 			throw new Exception("Missing ID");
 		}
+	}
+
+	protected function postOpen($dirs, $params)
+	{
+		// TODO: Validate and filter params
+		$stance = $params['stance'];
+		$argument = $params['argument'];
+		$subject_id = $params['subject_id'];
+
+		return $this->model->postOpen($subject_id, $stance, $argument);
 	}
 
 	protected function getPending($params)
