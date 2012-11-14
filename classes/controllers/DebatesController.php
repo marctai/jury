@@ -50,6 +50,17 @@ class DebatesController extends MyController
 		return $data;
 	}
 
+	protected function getPending($dirs, $params)
+	{
+		// Get debates waiting for votes
+		return $this->model->getPending();
+	}
+
+	protected function putPending($id)
+	{
+		// ...
+	}
+
 	protected function getOpen($dirs, $params)
 	{
 		$allowed_dirs = array('random');
@@ -68,6 +79,7 @@ class DebatesController extends MyController
 
 	protected function putOpen($dirs, $params)
 	{
+		// Check if dir is a number
 		if (isset($dirs[0]) && ctype_digit($dirs[0])) {
 
 			if (isset($params['argument']) && isset($params['stance']) && isset($params['subject_id'])) {
@@ -91,11 +103,6 @@ class DebatesController extends MyController
 		$subject_id = $params['subject_id'];
 
 		return $this->model->postOpen($subject_id, $stance, $argument);
-	}
-
-	protected function getPending($params)
-	{
-		return 'pending';
 	}
 
 	protected function getFinished($params, $method)
