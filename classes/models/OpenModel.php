@@ -1,10 +1,8 @@
 <?php
 
-class DebatesModel extends Model
+class OpenModel extends Model
 {
-	private $hours_of_voting = 24;
-
-	public function getOpen()
+	public function getDebate()
 	{
 		// First check if there is debates waiting for a second debater
 		$sql = "SELECT debates.id, arguments.stance, subjects.subject, subjects.id AS subjects_id
@@ -35,7 +33,6 @@ class DebatesModel extends Model
 
 	protected function startNewGame()
 	{
-		// Select a subject, subject_id
 		// TODO: Check to see if subject already been displayed 
 		$sql = "SELECT id, subject FROM subjects ORDER BY RAND() LIMIT 0,1;";
 
@@ -61,17 +58,7 @@ class DebatesModel extends Model
 		return $debate;
 	}
 
-	public function putOpen($subject_id, $stance, $argument, $id)
-	{
-		return $this->insertArgument($subject_id, $stance, $argument, $id);
-	}
-
-	public function postOpen($subject_id, $stance, $argument)
-	{
-		return $this->insertArgument($subject_id, $stance, $argument);
-	}
-
-	protected function insertArgument($subject_id, $stance, $argument, $id = null)
+	public function insertDebate($subject_id, $stance, $argument, $id = null)
 	{
 		try {
 			$stmt = $this->pdo->prepare("INSERT INTO arguments SET stance = :stance, argument = :argument, FK_subjects_id = :subject_id");
@@ -95,30 +82,4 @@ class DebatesModel extends Model
 		return true;
 	}
 
-	public function getPending()
-	{
-		$sql = "SELECT debates.id, a1.stance AS stance_first, a1.argument AS argument_first, a2.stance AS stance_second, a2.argument AS argument_second
-			FROM debates
-			JOIN arguments a1 ON FK_arguments_id_first = a1.id
-			JOIN arguments a2 ON FK_arguments_id_second = a2.id
-			WHERE TIMESTAMPDIFF( HOUR , stamp, NOW( ) ) < {$this->hours_of_voting}
-			LIMIT 0 , 30";
-
-		try {
-			$data = $this->pdo->query($sql);
-			$debates = array();
-			if ($data->rowCount() > 0) {
-				foreach ($data as $row) {
-					$debate = array('id' => $row['id'], 'first_argument' => array('stance' => $row['stance_first'], 'argument' => $row['argument_first']),
-						'opposing_argument' => array('stance' => $row['stance_second'], 'argument' => $row['argument_second']));
-					$debates[] = $debate;
-				}
-			} else {
-				$debates['message'] = "No voting goin' on here mate.";
-			}
-		} catch (PDOException $e) {
-			echo 'Database error in getPending: ' . $e->getMessage();
-		}
-		return $debates;
-	}
 }

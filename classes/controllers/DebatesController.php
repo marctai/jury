@@ -1,112 +1,53 @@
 <?php
 
-class DebatesController extends MyController
+class DebatesController
 {
-	protected $model;
-
-	public function __construct() 
-	{
-		$this->model = new DebatesModel();
-		return true;
-	}
-
-	protected function routeActions($request, $method, $allowed_dirs)
+	protected function routeActions($request, $method, $allowed_resources)
 	{
 		$data = '';
 
-		if (isset($request->url_elements[1]) && !empty($request->url_elements[1])) {
-			$dir = $request->url_elements[1];
+		// Check if a next resource has been set
+		if (isset($request->url_elements[1]) && !empty($request->url_elements[1])) 
+		{
+			$resource = $request->url_elements[1];
 			
-			if (in_array($dir, $allowed_dirs)) {
-				$dirs = array_slice($request->url_elements, 2);
-				$action = $method . ucfirst($dir);
-				$data = $this->$action($dirs, $request->parameters);
-			} else {
-				throw new Exception("Couldn't find " . $dir);
+			// If resource is allowed, init corresponding controller
+			if (in_array($resource, $allowed_resources)) 
+			{
+				$resources = array_slice($request->url_elements, 2);
+				$controller = ucfirst($resource).'Controller';
+				$resource = new $controller($resources, $request->parameters);
+				$data = $resource->$method();
+			} 
+			else 
+			{
+				errorHandler::sendError(errorHandler::ERRORCODE_404, '404', 'Resource not found');
 			}
 		}
 		return $data;
 	}
 
-
-	public function getAction($request)
+	public function action($request)
 	{
-		$allowed_dirs = array('open', 'pending', 'finished');	
-		$data = $this->routeActions($request, 'get', $allowed_dirs);
-		return $data;
-	}
-
-	public function postAction($request)
-	{
-		$allowed_dirs = array('open');
-		$data = $this->routeActions($request, 'post', $allowed_dirs);
-		return $data;
-	}
-
-	public function putAction($request)
-	{
-		$allowed_dirs = array('open');
-		$data = $this->routeActions($request, 'put', $allowed_dirs);
-		return $data;
-	}
-
-	protected function getPending($dirs, $params)
-	{
-		// Get debates waiting for votes
-		return $this->model->getPending();
-	}
-
-	protected function putPending($id)
-	{
-		// ...
-	}
-
-	protected function getOpen($dirs, $params)
-	{
-		$allowed_dirs = array('random');
-
-		if (!empty($dirs) && !$dirs[0] == '') {
-
-			if (in_array($dirs[0], $allowed_dirs)) {
-				// open/random stuff!
-				return 'open/' . $dirs[0];
-			} else {
-				throw new Exception("Couldn't find " . $dirs[0]);
-			}
+		// Allowed resources for the next step in the URI path
+		if ($request->verb == 'GET')
+		{
+			$allowed_resources = array('open', 'pending', 'finished');
 		}
-		return $this->model->getOpen();
-	}
-
-	protected function putOpen($dirs, $params)
-	{
-		// Check if dir is a number
-		if (isset($dirs[0]) && ctype_digit($dirs[0])) {
-
-			if (isset($params['argument']) && isset($params['stance']) && isset($params['subject_id'])) {
-				// TODO: Some kind of validation of params
-				// print_r($params);
-				return $this->model->putOpen($params['subject_id'], $params['stance'], $params['argument'], $dirs[0]);
-			} else {
-				throw new Exception("Missing parameters");
-				
-			}
-		} else {
-			throw new Exception("Missing ID");
+		elseif ($request->verb == 'POST')
+		{
+			$allowed_resources = array('open');
 		}
-	}
+		elseif ($request->verb == 'PUT')
+		{
+			$allowed_resources = array('open', 'pending');
+		}
+		else
+		{
+			throw new Exception("Not allowed http method");
+		}
 
-	protected function postOpen($dirs, $params)
-	{
-		// TODO: Validate and filter params
-		$stance = $params['stance'];
-		$argument = $params['argument'];
-		$subject_id = $params['subject_id'];
-
-		return $this->model->postOpen($subject_id, $stance, $argument);
-	}
-
-	protected function getFinished($params, $method)
-	{
-		return 'finished';
+		$data = $this->routeActions($request, $request->verb, $allowed_resources);
+		return $data;
 	}
 }

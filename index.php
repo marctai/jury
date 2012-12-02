@@ -23,6 +23,7 @@ spl_autoload_register(function($class_name) {
 
 
 $request = new Request();
+
 // echo '<pre>';
 // print_r($_SERVER);
 // echo '<br />';
@@ -36,8 +37,8 @@ try {
     $controller_name = ucfirst($request->url_elements[0]) . 'Controller';
     if (class_exists($controller_name)) {
     	$controller = new $controller_name();
-    	$action_name = strtolower($request->verb) . 'Action';
-    	$result = $controller->$action_name($request);
+    	// $action_name = strtolower($request->verb) . 'Action';
+    	$result = $controller->action($request);
     	print_r(json_encode($result));
     } else {
         throw new Exception("Couldn't find controller.");

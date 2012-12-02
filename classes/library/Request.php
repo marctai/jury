@@ -9,21 +9,24 @@ class Request
 	public function __construct()
 	{
 		$this->verb = $_SERVER['REQUEST_METHOD'];
+
 		if (isset($_SERVER['PATH_INFO'])) {
 			$this->url_elements = explode('/', $_SERVER['PATH_INFO']);
 			array_shift($this->url_elements);
 		}
+
 		if ($this->url_elements[0] == '') {
 			// Default controller
 			$this->url_elements[0] = 'users';
 		}
+		
 		$this->parseIncomingParams();
 		// Initialise JSON as default format
 		$this->format = 'json';
+
 		if (isset($this->parameters['format'])) {
 			$this->format = $this->parameters['format'];
 		}
-		return true;
 	}
 
 	public function parseIncomingParams()
