@@ -34,7 +34,7 @@ class OpenController
 		}
 		else
 		{
-			throw new Exception("Missing parameters");
+			errorHandler::sendError(errorHandler::ERRORCODE_400, '400', 'Missing or invalid parameters.');
 		}
 	}
 
@@ -57,12 +57,12 @@ class OpenController
 			} 
 			else 
 			{
-				throw new Exception("Missing parameters");	
+				errorHandler::sendError(errorHandler::ERRORCODE_400, '400', 'Missing or invalid parameters.');	
 			}
 		}
 		else 
 		{
-			throw new Exception("Missing ID");
+			errorHandler::sendError(errorHandler::ERRORCODE_400, '400', 'Missing or invalid ID.');
 		}
 	}
 }

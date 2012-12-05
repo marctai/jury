@@ -17,7 +17,7 @@ class Request
 
 		if ($this->url_elements[0] == '') {
 			// Default controller
-			$this->url_elements[0] = 'users';
+			// $this->url_elements[0] = 'users';
 		}
 		
 		$this->parseIncomingParams();

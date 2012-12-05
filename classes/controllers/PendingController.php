@@ -20,9 +20,23 @@ class PendingController
 
 	public function PUT()
 	{
-		// TODO: filtrering och validering
-		$id = $this->resources[0];
-		$stance = $this->parameters['vote'];
-		return $this->model->vote($id, $stance);
+		if (isset($this->resources[0]) && ctype_digit($this->resources[0]))
+		{
+			$id = $this->resources[0];
+			
+			if (isset($this->parameters['vote']) && ($this->parameters['vote'] == 'for' || $this->parameters['vote'] == 'against'))
+			{
+				$vote = $this->parameters['vote'];
+				return $this->model->vote($id, $vote);
+			}
+			else
+			{
+				errorHandler::sendError(errorHandler::ERRORCODE_400, '400', 'Missing vote parameter or vote parameter set to invalid value.');
+			}
+		}
+		else
+		{
+			errorHandler::sendError(errorHandler::ERRORCODE_400, '400', 'Missing or invalid ID.');
+		}	
 	}
 }
